@@ -1,0 +1,9 @@
+import os
+
+# SECRET_KEY and JWT_SECRET_KEY should prefably be set as os enviroment variables but they can be manually added here too.
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key-here'
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'your-jwt-secret-key-here'
+    JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 hour in seconds
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///app.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
