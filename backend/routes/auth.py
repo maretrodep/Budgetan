@@ -1,6 +1,6 @@
 import json
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity, jwt_required, create_access_token, create_refresh_token
 from backend import db, jwt
 from backend.models.user import User
 from . import auth_bp
@@ -38,6 +38,14 @@ def login():
     if user and user.check_password(password):
         identity = json.dumps({'id': user.id, 'role': user.role})
         access_token = create_access_token(identity=identity)
-        return jsonify(access_token=access_token), 200
+        refresh_token = create_refresh_token(identity=identity)
+        return jsonify(access_token=access_token, refresh_token=refresh_token), 200
 
     return jsonify({"message": "Invalid email or password"}), 401
+
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    return jsonify(access_token=access_token), 200
