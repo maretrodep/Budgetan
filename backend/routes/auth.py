@@ -1,6 +1,6 @@
 import json
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token
 from backend import db, jwt
 from backend.models.user import User
 from . import auth_bp
