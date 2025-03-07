@@ -64,8 +64,8 @@ def change_password():
     if new_password != new_password_repeat:
         return jsonify({"message": "New passwords don't match}"}), 400
     
-    user_identity = get_jwt_identity()
-    user = User.query.get(user_identity["id"])
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
 
     if not user or not user.check_password(current_password):
         return jsonify({"message": "Incorrect current password"}), 401

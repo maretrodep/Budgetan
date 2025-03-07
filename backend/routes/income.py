@@ -30,7 +30,7 @@ def add_income():
 # Update an income record
 @income_bp.route('/update_income', methods=['PUT'])
 @jwt_required()
-def update_income(income_id):
+def update_income():
     income_id = request.args.get('id')
     user_id = get_jwt_identity()
     data = request.get_json()
