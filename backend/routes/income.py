@@ -31,7 +31,26 @@ def add_income():
 @income_bp.route('/update_income', methods=['PUT'])
 @jwt_required()
 def update_income(income_id):
-    pass
+    income_id = request.args.get('id')
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    if not income_id:
+        return jsonify({"message": "Income ID is required"}), 400
+
+    income = Income.query.filter_by(id=income_id, user_id=user_id).first()
+    if not income:
+        return jsonify({"message": "Income not found"}), 404
+
+    # Update the income record
+    if 'amount' in data:
+        income.amount = data['amount']
+    if 'note' in data:
+        income.note = data['note']
+
+    db.session.commit()
+
+    return jsonify({"message": "Income updated successfully"}), 200
 
 @income_bp.route('/delete_incomes', methods=['DELETE'])
 @jwt_required()
