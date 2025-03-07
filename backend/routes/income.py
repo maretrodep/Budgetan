@@ -8,7 +8,24 @@ from . import income_bp
 @income_bp.route('/add_income', methods=['POST'])
 @jwt_required()
 def add_income():
-    pass
+    data = request.get_json()
+    user_id = get_jwt_identity()
+
+    # Validate required fields
+    if not data.get('amount'):
+        return jsonify({"message": "Amount is required"}), 400
+
+    # Create a new income record
+    new_income = Income(
+        user_id=user_id,
+        amount=data['amount'],
+        notes=data.get('note', '')  # Optional field
+    )
+
+    db.session.add(new_income)
+    db.session.commit()
+
+    return jsonify({"message": "Income created successfully"}), 201
 
 # Update an income record
 @income_bp.route('/update_income', methods=['PUT'])

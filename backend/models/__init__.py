@@ -1,3 +1,3 @@
 from .user import User
-from .user import Expense
-from .user import Income
+from .expense import Expense
+from .income import Income
