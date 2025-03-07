@@ -19,7 +19,9 @@ def create_app(config_class='backend.config.Config'):
 
     # Import and register blueprints
     from backend.routes.auth import auth_bp
+    from backend.routes.income import income_bp
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(income_bp, url_prefix="/transaction/income")
 
     return app
