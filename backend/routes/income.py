@@ -19,7 +19,7 @@ def add_income():
     new_income = Income(
         user_id=user_id,
         amount=data['amount'],
-        notes=data.get('note', '')  # Optional field
+        note=data.get('note', '')  # Optional field
     )
 
     db.session.add(new_income)
@@ -33,8 +33,34 @@ def add_income():
 def update_income(income_id):
     pass
 
-# Delete an income record
-@income_bp.route('/delete_income', methods=['DELETE'])
+@income_bp.route('/delete_incomes', methods=['DELETE'])
 @jwt_required()
-def delete_income(income_id):
-    pass
+def delete_incomes():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    # Validate the request data
+    if not data or 'income_ids' not in data:
+        return jsonify({"message": "Income IDs are required"}), 400
+
+    income_ids = data['income_ids']
+
+    # Fetch and delete the income records
+    incomes = Income.query.filter(Income.id.in_(income_ids), Income.user_id == user_id).all()
+    if not incomes:
+        return jsonify({"message": "No matching incomes found"}), 404
+
+    if len(income_ids) != len(incomes):
+        return jsonify({"message": "Some of the income ids don't exist"}), 400
+    
+    for income in incomes:
+        db.session.delete(income)
+
+    db.session.commit()
+
+    if len(incomes) == 1:
+        message = "income deleted successfully"
+    else:
+        message = f"{len(incomes)} incomes deleted successfully"
+
+    return jsonify({"message": message}), 200
