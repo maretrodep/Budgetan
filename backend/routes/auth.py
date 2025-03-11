@@ -3,6 +3,7 @@ from flask import request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required, create_access_token, create_refresh_token
 from backend import db
 from backend.models.user import User
+from config import DatabaseConfig
 from . import auth_bp
 
 @auth_bp.route('/register', methods=['POST'])
@@ -16,6 +17,12 @@ def register():
         return jsonify({"message": "Missing required fields"}), 400
 
     if User.query.filter_by(email=email).first():
+        return jsonify({"message": f"Profile name is longer than {DatabaseConfig.TEXT}"}), 422
+    
+    if profile_name > DatabaseConfig.TEXT_SIZE:
+        return jsonify({"message": f"Email is longer than {DatabaseConfig.TEXT}"}), 422
+    
+    if email > DatabaseConfig.TEXT_SIZE:
         return jsonify({"message": "Email already registered"}), 400
 
     user = User(profile_name=profile_name, email=email, role='user')
