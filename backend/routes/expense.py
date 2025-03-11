@@ -95,6 +95,11 @@ def is_expense_valid(data):
     valid_statuses = ['Pending', 'Paid']
     if data['status'] not in valid_statuses:
         return False, "Status must be either Pending or Paid", 400
+    
+    # Validate category
+    valid_statuses = ['Living Costs', 'Entertainment', 'Unexpected', 'Personal Care', 'Other']
+    if data['status'] not in valid_statuses:
+        return False, "Status must be either Pending or Paid", 400
 
     # Validate Category Size
     if len(data['category']) > DatabaseConfig.TEXT_SIZE:
