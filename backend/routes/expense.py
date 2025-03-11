@@ -13,52 +13,14 @@ def add_expense():
     data = request.get_json()
     user_id = get_jwt_identity()
 
-    # Validate required fields
-    required_fields = ['amount', 'category', 'priority', 'status', 'mood']
-    for field in required_fields:
-        if not data.get(field):
-            return jsonify({"message": f"{field.capitalize()} is required"}), 400
-
-    # Validate amount
-    try:
-        amount = float(data['amount'])
-        if amount <= 0:
-            return jsonify({"message": "Amount must be a positive number"}), 400
-    except ValueError:
-        return jsonify({"message": "Amount must be a valid number"}), 400
-
-    # Validate time (if provided)
-    if 'time' in data:
-        try:
-            time = datetime.strptime(data['time'], '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            return jsonify({"message": "Time must be in the format 'YYYY-MM-DD HH:MM:SS'"}), 400
-
-    # Validate priority
-    valid_priorities = ['Essential', 'Optional']
-    if data['priority'] not in valid_priorities:
-        return jsonify({"message": "Priority must be either Essential or Optional"}), 400
-
-    # Validate status
-    valid_statuses = ['Pending', 'Paid']
-    if data['status'] not in valid_statuses:
-        return jsonify({"message": "Status must be either Pending or Paid"}), 400
-
-    # Validate Category Size
-    if data['status'] > DatabaseConfig.TEXT_SIZE:
-        return jsonify({"message": f"Category is longer than {DatabaseConfig.TEXT}"}), 422
-
-
-# Validate mood
-    valid_moods = ['Happy', 'Sad']
-    if data['mood'] not in valid_moods:
-        return jsonify({"message": "Mood must be either Happy or Sad"}), 400
-
+    is_valid, message, status_code = is_expense_valid(data)
+    if not is_valid:
+        return jsonify({"message": message}), status_code
 
     # Create a new expense record
     new_expense = Expense(
         user_id=user_id,
-        amount=amount,
+        amount=float(data['amount']),
         category=data['category'],
         priority=data['priority'],
         status=data['status'],
@@ -102,3 +64,45 @@ def delete_expenses():
         message = f"{len(expenses)} expensess deleted successfully"
 
     return jsonify({"message": message}), 200
+
+def is_expense_valid(data):
+    required_fields = ['amount', 'category', 'priority', 'status', 'mood']
+    for field in required_fields:
+        if not data.get(field):
+            return False, f"{field.capitalize()} is required", 400
+
+    # Validate amount
+    try:
+        amount = float(data['amount'])
+        if amount <= 0:
+            return False, "Amount must be a positive number", 400
+    except ValueError:
+        return False, "Amount must be a valid number", 400
+
+    # Validate time (if provided)
+    if 'time' in data:
+        try:
+            datetime.strptime(data['time'], '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return False, "Time must be in the format 'YYYY-MM-DD HH:MM:SS'", 400
+
+    # Validate priority
+    valid_priorities = ['Essential', 'Optional']
+    if data['priority'] not in valid_priorities:
+        return False, "Priority must be either Essential or Optional", 400
+
+    # Validate status
+    valid_statuses = ['Pending', 'Paid']
+    if data['status'] not in valid_statuses:
+        return False, "Status must be either Pending or Paid", 400
+
+    # Validate Category Size
+    if len(data['category']) > DatabaseConfig.TEXT_SIZE:
+        return False, f"Category is longer than {DatabaseConfig.TEXT_SIZE}", 422
+
+    # Validate mood
+    valid_moods = ['Happy', 'Sad']
+    if data['mood'] not in valid_moods:
+        return False, "Mood must be either Happy or Sad", 400
+
+    return True, "Valid", 200
