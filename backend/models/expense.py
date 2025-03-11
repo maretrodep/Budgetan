@@ -13,5 +13,4 @@ class Expense(db.Model):
     priority = db.Column(db.String(DatabaseConfig.TEXT_SIZE), nullable=False)
     status = db.Column(db.String(DatabaseConfig.TEXT_SIZE), nullable=False)
     mood = db.Column(db.String(DatabaseConfig.TEXT_SIZE), nullable=False)
-    tags = db.Column(db.String(DatabaseConfig.TEXT_SIZE))
     note = db.Column(db.Text)

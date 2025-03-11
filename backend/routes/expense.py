@@ -63,7 +63,6 @@ def add_expense():
         priority=data['priority'],
         status=data['status'],
         mood=data['mood'],
-        tags=data.get('tags', ''),  # Optional field
         note=data.get('note', '')  # Optional field
     )
 
