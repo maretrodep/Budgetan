@@ -1,14 +1,15 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend import db
+from config import DatabaseConfig
 
 class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    role = db.Column(db.String(50), nullable=False, default='user')
-    profile_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(DatabaseConfig.TEXT_SIZE), nullable=False, default='user')
+    profile_name = db.Column(db.String(DatabaseConfig.TEXT_SIZE), nullable=False)
+    email = db.Column(db.String(DatabaseConfig.TEXT_SIZE), unique=True, nullable=False)
+    password_hash = db.Column(db.String(DatabaseConfig.HASH_SIZE), nullable=False)
     expenses = db.relationship('Expense', backref='user', lazy=True)
     incomes = db.relationship('Income', backref='user', lazy=True)
 
