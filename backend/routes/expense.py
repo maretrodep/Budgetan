@@ -65,6 +65,48 @@ def delete_expenses():
 
     return jsonify({"message": message}), 200
 
+@expense_bp.route('/get_monthly_expense', methods=['GET'])
+@jwt_required()
+def get_monthly_expenses():
+    user_id = get_jwt_identity()
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    
+    if not year or not month or month not in range(1, 13):
+        return jsonify({"message": "Valid year and month are required"}), 400
+    
+    expenses = retrive_monthly_expenses(user_id, year, month)
+
+    return jsonify({
+    "expenses": [
+        {
+            "id": expense.id,
+            "amount": expense.amount,
+            "time": expense.timestamp.isoformat(),
+            "category": expense.category,
+            "priority": expense.priority,
+            "status": expense.status,
+            "mood": expense.mood,
+            "note": expense.note if expense.note else ""
+        }
+        for expense in expenses
+        ]
+    }), 200
+
+def retrive_monthly_expenses(user_id, year, month):
+    """Retrieve all income records for a user within a specific month."""
+    start_date = datetime(year, month, 1)
+    if month == 12:
+        end_date = datetime(year + 1, 1, 1)
+    else:
+        end_date = datetime(year, month + 1, 1)
+    
+    return Expense.query.filter(
+        Expense.user_id == user_id,
+        Expense.time >= start_date,
+        Expense.time < end_date
+    ).all()
+
 def is_expense_valid(data):
     required_fields = ['amount', 'category', 'priority', 'status', 'mood']
     for field in required_fields:

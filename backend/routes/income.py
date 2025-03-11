@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from backend import db
@@ -83,3 +84,42 @@ def delete_incomes():
         message = f"{len(incomes)} incomes deleted successfully"
 
     return jsonify({"message": message}), 200
+
+@income_bp.route('/get_monthly_income', methods=['GET'])
+@jwt_required()
+def get_monthly_incomes():
+    user_id = get_jwt_identity()
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    
+    if not year or not month or month not in range(1, 13):
+        return jsonify({"message": "Valid year and month are required"}), 400
+    
+    incomes = retrive_monthly_incomes(user_id, year, month)
+    
+    return jsonify({
+    "incomes": [
+        {
+            "id": income.id,
+            "amount": income.amount,
+            "time": income.timestamp.isoformat(),
+            "note": income.note if income.note else ""
+        }
+        for income in incomes
+        ]
+    }), 200
+
+def retrive_monthly_incomes(user_id, year, month):
+    """Retrieve all income records for a user within a specific month."""
+    start_date = datetime(year, month, 1)
+    if month == 12:
+        end_date = datetime(year + 1, 1, 1)
+    else:
+        end_date = datetime(year, month + 1, 1)
+    
+    return Income.query.filter(
+        Income.user_id == user_id,
+        Income.time >= start_date,
+        Income.time < end_date
+    ).all()
+
