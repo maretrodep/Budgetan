@@ -3,6 +3,7 @@ from flask import request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from backend import db
 from backend.models.expense import Expense
+from config import DatabaseConfig
 from . import expense_bp
 
 # Create a new expense record
@@ -43,10 +44,16 @@ def add_expense():
     if data['status'] not in valid_statuses:
         return jsonify({"message": "Status must be either Pending or Paid"}), 400
 
-    # Validate mood
+    # Validate Category Size
+    if data['status'] > DatabaseConfig.TEXT_SIZE:
+        return jsonify({"message": f"Category is longer than {DatabaseConfig.TEXT}"}), 422
+
+
+# Validate mood
     valid_moods = ['Happy', 'Sad']
     if data['mood'] not in valid_moods:
         return jsonify({"message": "Mood must be either Happy or Sad"}), 400
+
 
     # Create a new expense record
     new_expense = Expense(
