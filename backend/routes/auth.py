@@ -15,15 +15,15 @@ def register():
 
     if not email or not password or not profile_name:
         return jsonify({"message": "Missing required fields"}), 400
-
+    
     if User.query.filter_by(email=email).first():
-        return jsonify({"message": f"Profile name is longer than {DatabaseConfig.TEXT}"}), 422
+        return jsonify({"message": f"Email already registered"}), 422
     
     if len(profile_name) > DatabaseConfig.TEXT_SIZE:
-        return jsonify({"message": f"Email is longer than {DatabaseConfig.TEXT}"}), 422
+        return jsonify({"message": f"Email is longer than {DatabaseConfig.TEXT_SIZE}"}), 422
     
     if len(email) > DatabaseConfig.TEXT_SIZE:
-        return jsonify({"message": "Email already registered"}), 400
+        return jsonify({"message": "Profile name is longer than {DatabaseConfig.TEXT_SIZE}"}), 400
 
     user = User(profile_name=profile_name, email=email, role='user')
     user.set_password(password)
