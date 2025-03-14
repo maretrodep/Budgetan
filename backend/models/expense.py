@@ -1,6 +1,6 @@
 from backend import db
 from datetime import datetime
-from config import DatabaseConfig
+from ..config import DatabaseConfig
 
 class Expense(db.Model):
     __tablename__ = 'expenses'

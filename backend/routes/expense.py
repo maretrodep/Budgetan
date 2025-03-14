@@ -3,7 +3,7 @@ from flask import request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from backend import db
 from backend.models.expense import Expense
-from config import DatabaseConfig
+from ..config import DatabaseConfig
 from . import expense_bp
 
 # Create a new expense record
