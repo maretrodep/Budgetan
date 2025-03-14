@@ -19,10 +19,10 @@ def register():
     if User.query.filter_by(email=email).first():
         return jsonify({"message": f"Profile name is longer than {DatabaseConfig.TEXT}"}), 422
     
-    if profile_name > DatabaseConfig.TEXT_SIZE:
+    if len(profile_name) > DatabaseConfig.TEXT_SIZE:
         return jsonify({"message": f"Email is longer than {DatabaseConfig.TEXT}"}), 422
     
-    if email > DatabaseConfig.TEXT_SIZE:
+    if len(email) > DatabaseConfig.TEXT_SIZE:
         return jsonify({"message": "Email already registered"}), 400
 
     user = User(profile_name=profile_name, email=email, role='user')
