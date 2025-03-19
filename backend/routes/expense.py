@@ -82,7 +82,7 @@ def get_monthly_expenses():
         {
             "id": expense.id,
             "amount": expense.amount,
-            "time": expense.timestamp.isoformat(),
+            "time": expense.time.isoformat(),
             "category": expense.category,
             "priority": expense.priority,
             "status": expense.status,
