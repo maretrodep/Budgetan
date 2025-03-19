@@ -102,7 +102,7 @@ def get_monthly_incomes():
         {
             "id": income.id,
             "amount": income.amount,
-            "time": income.times.isoformat(),
+            "time": income.time.isoformat(),
             "note": income.note if income.note else ""
         }
         for income in incomes
