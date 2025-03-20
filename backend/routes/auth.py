@@ -73,10 +73,21 @@ def change_password():
         return jsonify({"message": "Missing one of the fields"}), 400
 
     if new_password != new_password_repeat:
-        return jsonify({"message": "New passwords don't match}"}), 400
-    
+        return jsonify({"message": "New passwords don't match"}), 400
+
     user_id = get_jwt_identity()
+    # If your JWT identity is a JSON string, ensure it's parsed first (as previously shown)
+    try:
+        user_id = int(json.loads(user_id)["id"]) if isinstance(user_id, str) else int(user_id.get("id"))
+    except Exception as e:
+        return jsonify({"message": "Invalid user ID format"}), 400
+
     user = User.query.get(user_id)
+
+    # Debug prints (remove in production)
+    print("Stored hash:", user.password_hash)
+    print("Provided current password:", current_password)
+    print("Password check result:", user.check_password(current_password))
 
     if not user or not user.check_password(current_password):
         return jsonify({"message": "Incorrect current password"}), 401
@@ -85,3 +96,4 @@ def change_password():
     db.session.commit()
 
     return jsonify({"message": "Password updated successfully"}), 200
+
