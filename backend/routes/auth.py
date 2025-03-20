@@ -97,3 +97,30 @@ def change_password():
 
     return jsonify({"message": "Password updated successfully"}), 200
 
+@auth_bp.route('/profile_info', methods=['GET'])
+@jwt_required()
+def get_profile_info():
+    identity = get_jwt_identity()
+    print("JWT Identity:", identity)
+
+    if isinstance(identity, str):
+        try:
+            identity = json.loads(identity)
+        except Exception as e:
+            print("Error decoding JWT identity:", e)
+            return jsonify({"message": "Invalid JWT identity format"}), 400
+
+    user_id = identity.get("id") if isinstance(identity, dict) else identity
+
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError) as e:
+        return jsonify({"message": "Invalid user ID format"}), 400
+
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    return jsonify({"profile_name": user.profile_name}), 200
+
