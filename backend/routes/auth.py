@@ -12,9 +12,13 @@ def register():
     email = data.get('email')
     profile_name = data.get('profile_name')
     password = data.get('password')
+    password_repeat = data.get('password_repeat')
 
     if not email or not password or not profile_name:
         return jsonify({"message": "Missing required fields"}), 400
+    
+    if password != password_repeat:
+        return jsonify({"message": "New passwords don't match}"}), 400
     
     if User.query.filter_by(email=email).first():
         return jsonify({"message": f"Email already registered"}), 422
